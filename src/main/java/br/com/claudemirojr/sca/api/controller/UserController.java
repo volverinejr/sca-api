@@ -24,8 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.claudemirojr.sca.api.model.ParamsRequestModel;
 import br.com.claudemirojr.sca.api.model.service.IUserClienteSistemaService;
+import br.com.claudemirojr.sca.api.model.service.IUserTimeService;
 import br.com.claudemirojr.sca.api.model.vo.UserClienteSistemaInput;
 import br.com.claudemirojr.sca.api.security.model.vo.UserPermissionInput;
+import br.com.claudemirojr.sca.api.security.model.vo.UserTimeInput;
 import br.com.claudemirojr.sca.api.security.model.vo.UserVO;
 import br.com.claudemirojr.sca.api.security.model.vo.UserVOInput;
 import br.com.claudemirojr.sca.api.security.service.IUserPermissionService;
@@ -47,6 +49,9 @@ public class UserController {
 
 	@Autowired
 	private IUserPermissionService userPermissionService;
+
+	@Autowired
+	private IUserTimeService userTimeService;
 
 	@Operation(summary = "Criar um novo usuário")
 	@PostMapping
@@ -133,6 +138,7 @@ public class UserController {
 		return userVO;
 	}
 
+	// -- USER x SISTEMA
 	@Operation(summary = "Dado um {id} do usuário, Listar todos os sistemas sinalizando qual está vinculado a ele")
 	@GetMapping("/{id}/sistemas")
 	public ResponseEntity<?> FindBySistemasDoUser(@PathVariable Long id, @RequestParam Map<String, String> params) {
@@ -158,6 +164,7 @@ public class UserController {
 		return ResponseEntity.ok().build();
 	}
 
+	// -- USER x PERMISSÃO
 	@Operation(summary = "Dado um {id} do usuário, Listar todas as permissões, sinalizando qual está vinculado a ele")
 	@GetMapping("/{id}/permissao")
 	public ResponseEntity<?> findByPermissaoDoUser(@PathVariable Long id, @RequestParam Map<String, String> params) {
@@ -179,6 +186,32 @@ public class UserController {
 	public ResponseEntity<?> deletePermissaoDoUser(@PathVariable Long id, @PathVariable Long permissaoId) {
 
 		userPermissionService.deletePermissaoDoUser(permissaoId, id);
+
+		return ResponseEntity.ok().build();
+	}
+
+	// -- USER x TIME
+	@Operation(summary = "Dado um {id} do usuário (técnico), Listar todos os times sinalizando qual está vinculado a ele")
+	@GetMapping("/{id}/time")
+	public ResponseEntity<?> FindByTimesDoUsuario(@PathVariable Long id, @RequestParam Map<String, String> params) {
+		ParamsRequestModel prm = new ParamsRequestModel(params);
+
+		return new ResponseEntity<>(userTimeService.FindByTimesDoUsuario(id, prm), HttpStatus.OK);
+	}
+
+	@Operation(summary = "Vincular time ao usuário")
+	@PostMapping("/time")
+	public ResponseEntity<?> addTimeAoUser(@RequestBody @Valid UserTimeInput userTimeInput) {
+		userTimeService.addTimeAoUser(userTimeInput.getUserId(), userTimeInput.getTimeId());
+
+		return new ResponseEntity<>(null, HttpStatus.CREATED);
+	}
+
+	@Operation(summary = "Remover vinculo do time com o usuário")
+	@DeleteMapping("/{id}/time/{timeId}")
+	public ResponseEntity<?> deleteUserDoTime(@PathVariable Long id, @PathVariable Long timeId) {
+
+		userTimeService.deleteUserDoTime(id, timeId);
 
 		return ResponseEntity.ok().build();
 	}

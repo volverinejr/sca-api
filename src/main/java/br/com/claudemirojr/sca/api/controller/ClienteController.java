@@ -134,7 +134,7 @@ public class ClienteController {
 		return new ResponseEntity<>(serviceClienteSistema.FindBySistemasDoCliente(id, prm), HttpStatus.OK);
 	}
 
-	@Operation(summary = "Dado um {id} do cliente, Listar todos os sistemas sinalizando qual está vinculado a ele")
+	@Operation(summary = "Vincular sistema ao cliente")
 	@PostMapping("/sistemas")
 	@PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE_ALL', 'CLIENTE_DETALHE', 'CLIENTE_UPDATE')")
 	public ResponseEntity<?> addSistemaAoCliente(@RequestBody @Valid ClienteSistemaInput clienteSistemaInput) {
@@ -143,7 +143,7 @@ public class ClienteController {
 		return new ResponseEntity<>(null, HttpStatus.CREATED);
 	}
 	
-	@Operation(summary = "Dado um {id} do cliente, Listar todos os sistemas sinalizando qual está vinculado a ele")
+	@Operation(summary = "Remover vinculo do sistema com o cliente")
 	@DeleteMapping("/{id}/sistema/{sistemaId}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE_ALL', 'CLIENTE_DETALHE', 'CLIENTE_UPDATE')")
 	public ResponseEntity<?> deleteSistemaDoCliente(@PathVariable Long id, @PathVariable Long sistemaId) {
