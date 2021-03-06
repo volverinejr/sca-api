@@ -1,5 +1,6 @@
 package br.com.claudemirojr.sca.api.model.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -35,6 +36,7 @@ public interface UserTimeRepository extends JpaRepository<UserTime, Long> {
 	
 	Optional<UserTime> findByUserAndTime(User user, Time time);
 	
+	List<UserTime> findByUser(User user);
 	
 
 }
