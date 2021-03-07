@@ -55,7 +55,7 @@ public class SprintServices implements ISprintService {
 	@Transactional(readOnly = false)
 	public void delete(Long id) {
 		Sprint entity = sprintRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException(String.format("Time não encontrado para id %d", id)));
+				.orElseThrow(() -> new ResourceNotFoundException(String.format("Sprint não encontrado para id %d", id)));
 
 		if ( entity.getDataEncaminhamentoAoTime() != null ) {
 			throw new ResourceInvalidException("Sprint " + entity.getId() + " já encaminhado ao time, operação não permitida!");

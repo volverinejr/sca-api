@@ -71,7 +71,7 @@ public class TimeController {
 
 	@Operation(summary = "Find all times, por páginas")
 	@GetMapping
-	@PreAuthorize("hasAnyRole('ADMIN', 'TIME_ALL', 'TIME_LIST')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'TIME_ALL', 'TIME_LIST', 'SPRINT_ALL')")
 	public ResponseEntity<?> findAll(@RequestParam Map<String, String> params) {
 		ParamsRequestModel prm = new ParamsRequestModel(params);
 

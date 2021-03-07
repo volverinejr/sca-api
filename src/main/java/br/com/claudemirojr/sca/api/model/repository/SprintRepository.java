@@ -1,6 +1,7 @@
 package br.com.claudemirojr.sca.api.model.repository;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,5 +15,10 @@ public interface SprintRepository extends JpaRepository<Sprint, Long> {
 	Page<Sprint> findByIdGreaterThanEqual(Long id, Pageable pageable);
 
 	Page<Sprint> findByTimeInAndDataEncaminhamentoAoTimeIsNotNull(Collection<Time> times, Pageable pageable);
+
+	Page<Sprint> findByIdGreaterThanEqualAndTimeInAndDataEncaminhamentoAoTimeIsNotNull(Long id, Collection<Time> times,
+			Pageable pageable);
+
+	Optional<Sprint> findByIdAndTimeInAndDataEncaminhamentoAoTimeIsNotNull(Long id, Collection<Time> times);
 
 }

@@ -58,6 +58,41 @@ public class FabricaService implements IFabricaService {
 		return page.map(this::convertToSprintVO);
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public Page<SprintVO> findByIdGreaterThanEqualSprintDoTime(Long id, ParamsRequestModel prm) {
+		var user = useRepository.findByUserName(userService.getUsuarioLogado());
+		if (user == null) {
+			throw new ResourceNotFoundException("Username " + userService.getUsuarioLogado() + " nao existe!");
+		}
+
+		Pageable pageable = prm.toSpringPageRequest();
+
+		var page = sprintRepository.findByIdGreaterThanEqualAndTimeInAndDataEncaminhamentoAoTimeIsNotNull(id,
+				this.getTimesDoUsuario(user), pageable);
+
+		return page.map(this::convertToSprintVO);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public SprintVO findById(Long id) {
+		sprintRepository.findById(id).orElseThrow(
+				() -> new ResourceNotFoundException(String.format("Sprint não encontrado para id %d", id)));
+
+
+		var user = useRepository.findByUserName(userService.getUsuarioLogado());
+		if (user == null) {
+			throw new ResourceNotFoundException("Username " + userService.getUsuarioLogado() + " nao existe!");
+		}
+		
+		var entity = sprintRepository
+				.findByIdAndTimeInAndDataEncaminhamentoAoTimeIsNotNull(id, this.getTimesDoUsuario(user))
+				.orElseThrow(() -> new ResourceNotFoundException(String.format("Sprint %d não liberado para o time", id)));
+
+		return DozerConverter.parseObject(entity, SprintVO.class);
+	}
+
 	private List<Time> getTimesDoUsuario(User user) {
 		List<Time> times = new ArrayList<>();
 		List<UserTime> userTimes = userTimeRepository.findByUser(user);
