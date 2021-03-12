@@ -1,5 +1,6 @@
 package br.com.claudemirojr.sca.api.model.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -65,5 +66,12 @@ public interface SprintSolicitacaoRepository extends JpaRepository<SprintSolicit
 	
 	
 	Optional<SprintSolicitacao> findBySolicitacaoAndSprint(Solicitacao solicitacao, Sprint sprint);
+	
+	
+	Page<SprintSolicitacao> findBySprint(Sprint sprint, Pageable pageable);
+	
+	List<SprintSolicitacao> findBySprint(Sprint sprint);
+	
+	
 	
 }

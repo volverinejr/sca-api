@@ -1,8 +1,11 @@
 package br.com.claudemirojr.sca.api.model.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 
 import br.com.claudemirojr.sca.api.model.ParamsRequestModel;
+import br.com.claudemirojr.sca.api.model.vo.SolicitacaoVO;
 import br.com.claudemirojr.sca.api.model.vo.SprintVO;
 
 public interface ISprintService {
@@ -12,7 +15,7 @@ public interface ISprintService {
 	public SprintVO update(SprintVO sprintVO);
 
 	public void delete(Long id);
-	
+
 	public void encaminarAoTime(Long id);
 
 	public Page<SprintVO> findAll(ParamsRequestModel prm);
@@ -20,5 +23,7 @@ public interface ISprintService {
 	public Page<SprintVO> findByIdGreaterThanEqual(Long id, ParamsRequestModel prm);
 
 	public SprintVO findById(Long id);
+
+	public List<SolicitacaoVO> findBySprint(Long id);
 
 }

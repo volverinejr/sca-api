@@ -12,11 +12,25 @@ import br.com.claudemirojr.sca.api.model.entity.enums.SolicitacaoStatus;
 import br.com.claudemirojr.sca.api.security.model.User;
 
 public interface SolicitacaoRepository extends JpaRepository<Solicitacao, Long> {
-	
+
 	Page<Solicitacao> findBySistemaIn(Collection<Sistema> sistemas, Pageable pageable);
-	
+
 	Page<Solicitacao> findByUser(User user, Pageable pageable);
-	
+
 	Page<Solicitacao> findByStatusAtualIn(Collection<SolicitacaoStatus> statusAtuals, Pageable pageable);
+	
+	//id
+	Page<Solicitacao> findByIdGreaterThanEqual(Long id, Pageable pageable);
+	
+	Page<Solicitacao> findByIdGreaterThanEqualAndSistemaIn(Long id, Collection<Sistema> sistemas, Pageable pageable);
+
+	Page<Solicitacao> findByIdGreaterThanEqualAndUser(Long id, User user, Pageable pageable);
+	
+	//descricao
+	Page<Solicitacao> findByDescricaoIgnoreCaseContaining(String descricao, Pageable pageable);
+	
+	Page<Solicitacao> findByDescricaoIgnoreCaseContainingAndSistemaIn(String descricao, Collection<Sistema> sistemas, Pageable pageable);
+
+	Page<Solicitacao> findByDescricaoIgnoreCaseContainingAndUser(String descricao, User user, Pageable pageable);
 
 }

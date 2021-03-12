@@ -31,7 +31,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "FaseEndpoint")
 @RestController
 @RequestMapping("/api/fase/v1")
-@PreAuthorize("hasAnyRole('ADMIN', 'FASE_ALL')")
 public class FaseController {
 
 	@Autowired
@@ -39,6 +38,7 @@ public class FaseController {
 
 	@Operation(summary = "Criar uma nova Fase")
 	@PostMapping
+	@PreAuthorize("hasAnyRole('ADMIN', 'FASE_ALL')")
 	public ResponseEntity<FaseVO> create(@RequestBody @Valid FaseVO fase) {
 
 		FaseVO faseVO = service.create(fase);
@@ -50,6 +50,7 @@ public class FaseController {
 
 	@Operation(summary = "Atualizar uma fase específica")
 	@PutMapping
+	@PreAuthorize("hasAnyRole('ADMIN', 'FASE_ALL')")
 	public ResponseEntity<FaseVO> update(@RequestBody @Valid FaseVO fase) {
 
 		FaseVO faseVO = service.update(fase);
@@ -61,6 +62,7 @@ public class FaseController {
 
 	@Operation(summary = "Deletar uma fase específico pelo seu ID")
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'FASE_ALL')")
 	public ResponseEntity<?> delete(@PathVariable("id") Long id) {
 		service.delete(id);
 
@@ -69,6 +71,7 @@ public class FaseController {
 
 	@Operation(summary = "Find all fases, por páginas")
 	@GetMapping
+	@PreAuthorize("hasAnyRole('ADMIN', 'FASE_ALL', 'FABRICA_ALL')")
 	public ResponseEntity<?> findAll(@RequestParam Map<String, String> params) {
 		ParamsRequestModel prm = new ParamsRequestModel(params);
 
@@ -81,6 +84,7 @@ public class FaseController {
 
 	@Operation(summary = "Find all fases, cujo {id} seja maior ou igual, por páginas")
 	@GetMapping("/findByIdGreaterThanEqual/{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'FASE_ALL')")
 	public ResponseEntity<?> findByIdGreaterThanEqual(@PathVariable Long id, @RequestParam Map<String, String> params) {
 		ParamsRequestModel prm = new ParamsRequestModel(params);
 
@@ -93,6 +97,7 @@ public class FaseController {
 
 	@Operation(summary = "Find all fases, cujo {nome} esteja contido, por páginas")
 	@GetMapping("/findByNome/{nome}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'FASE_ALL')")
 	public ResponseEntity<?> findByNome(@PathVariable String nome, @RequestParam Map<String, String> params) {
 		ParamsRequestModel prm = new ParamsRequestModel(params);
 
@@ -105,6 +110,7 @@ public class FaseController {
 
 	@Operation(summary = "procurar uma fase específica pelo seu ID")
 	@GetMapping(value = "/{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'FASE_ALL')")
 	public FaseVO findById(@PathVariable("id") Long id) {
 		FaseVO faseVO = service.findById(id);
 		faseVO.add(linkTo(methodOn(FaseController.class).findById(id)).withSelfRel());

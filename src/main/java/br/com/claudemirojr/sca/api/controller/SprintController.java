@@ -132,8 +132,7 @@ public class SprintController {
 
 		return ResponseEntity.ok().build();
 	}
-	
-	
+
 	@Operation(summary = "Encaminhar sprint ao time")
 	@PatchMapping("/{id}")
 	public ResponseEntity<?> encaminarAoTime(@PathVariable Long id) {
@@ -141,6 +140,12 @@ public class SprintController {
 		service.encaminarAoTime(id);
 
 		return ResponseEntity.ok().build();
-	}	
+	}
+
+	@Operation(summary = "Dado um {id} da sprint, Listar todos as suas solicitações")
+	@GetMapping("/{id}/solicitacao/All")
+	public ResponseEntity<?> findBySprintSolicitacao(@PathVariable Long id) {
+		return new ResponseEntity<>(service.findBySprint(id), HttpStatus.OK);
+	}
 
 }

@@ -4,18 +4,12 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
 import org.springframework.hateoas.RepresentationModel;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.dozermapper.core.Mapping;
-import com.sun.istack.NotNull;
 
-import br.com.claudemirojr.sca.api.model.entity.Cliente;
-import br.com.claudemirojr.sca.api.model.entity.Sistema;
 import br.com.claudemirojr.sca.api.model.entity.enums.SolicitacaoStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,8 +18,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@JsonPropertyOrder({ "id", "descricao", "sistema", "statusAtual", "userName" })
-public class SolicitacaoVO extends RepresentationModel<SolicitacaoVO> implements Serializable {
+@JsonPropertyOrder({ "id", "status", "observacao", "dataCadastroFormatada" })
+public class MovimentacaoVO extends RepresentationModel<MovimentacaoVO> implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -33,21 +27,11 @@ public class SolicitacaoVO extends RepresentationModel<SolicitacaoVO> implements
 	@JsonProperty("id")
 	private Long key;
 
-	@NotBlank
-	@Size(min = 10, max = 2000)
-	private String descricao;
+	private SolicitacaoStatus status;
 
-	private Cliente cliente;
-
-	@NotNull
-	private Sistema sistema;
-
-	private SolicitacaoStatus statusAtual;
-
-	private String userName;
+	private String observacao;
 	
 	private Date createdDate;
-	
 	
 	public String getDataCadastroFormatada() {
 
@@ -58,5 +42,6 @@ public class SolicitacaoVO extends RepresentationModel<SolicitacaoVO> implements
 
 		return null;
 	}	
+	
 
 }

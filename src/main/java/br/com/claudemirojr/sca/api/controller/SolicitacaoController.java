@@ -3,6 +3,7 @@ package br.com.claudemirojr.sca.api.controller;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -25,6 +26,7 @@ import br.com.claudemirojr.sca.api.model.ParamsRequestModel;
 import br.com.claudemirojr.sca.api.model.service.ISolicitacaoService;
 import br.com.claudemirojr.sca.api.model.vo.ClienteSistemaVO;
 import br.com.claudemirojr.sca.api.model.vo.ClienteVO;
+import br.com.claudemirojr.sca.api.model.vo.MovimentacaoVO;
 import br.com.claudemirojr.sca.api.model.vo.SolicitacaoVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -70,12 +72,46 @@ public class SolicitacaoController {
 		return solicitacaoVO;
 	}
 
+	@Operation(summary = "listar as movimentações de uma solicitação pelo seu {id}")
+	@GetMapping("/{id}/movimentacao")
+	public List<MovimentacaoVO> findByMovimentacao(@PathVariable("id") Long id) {
+		List<MovimentacaoVO> solicitacaoMovimentacao = service.findByMovimentacao(id);
+
+		return solicitacaoMovimentacao;
+	}
+
 	@Operation(summary = "Find all Solicitações, por páginas")
 	@GetMapping
 	public ResponseEntity<?> findAll(@RequestParam Map<String, String> params) {
 		ParamsRequestModel prm = new ParamsRequestModel(params);
 
 		Page<SolicitacaoVO> solicitacoes = service.findAll(prm);
+
+		solicitacoes.stream()
+				.forEach(p -> p.add(linkTo(methodOn(SolicitacaoController.class).findById(p.getKey())).withSelfRel()));
+
+		return ResponseEntity.ok(solicitacoes);
+	}
+
+	@Operation(summary = "Find all Solicitações, cujo {id} seja maior ou igual, por páginas")
+	@GetMapping("/findByIdGreaterThanEqual/{id}")
+	public ResponseEntity<?> findByIdGreaterThanEqual(@PathVariable Long id, @RequestParam Map<String, String> params) {
+		ParamsRequestModel prm = new ParamsRequestModel(params);
+
+		Page<SolicitacaoVO> solicitacoes = service.findByIdGreaterThanEqual(id, prm);
+
+		solicitacoes.stream()
+				.forEach(p -> p.add(linkTo(methodOn(SolicitacaoController.class).findById(p.getKey())).withSelfRel()));
+
+		return ResponseEntity.ok(solicitacoes);
+	}
+
+	@Operation(summary = "Find all Solicitações, cuja {descricao} esteja contido, por páginas")
+	@GetMapping("/findByDescricao/{descricao}")
+	public ResponseEntity<?> findByDescricao(@PathVariable String descricao, @RequestParam Map<String, String> params) {
+		ParamsRequestModel prm = new ParamsRequestModel(params);
+
+		Page<SolicitacaoVO> solicitacoes = service.findByDescricao(descricao, prm);
 
 		solicitacoes.stream()
 				.forEach(p -> p.add(linkTo(methodOn(SolicitacaoController.class).findById(p.getKey())).withSelfRel()));

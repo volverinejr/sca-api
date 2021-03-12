@@ -2,6 +2,7 @@ package br.com.claudemirojr.sca.api.model.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,7 @@ import br.com.claudemirojr.sca.api.model.service.ISolicitacaoService;
 import br.com.claudemirojr.sca.api.model.vo.ClienteSistemaVO;
 import br.com.claudemirojr.sca.api.model.vo.ClienteVO;
 import br.com.claudemirojr.sca.api.model.vo.ISistemaVO;
+import br.com.claudemirojr.sca.api.model.vo.MovimentacaoVO;
 import br.com.claudemirojr.sca.api.model.vo.SolicitacaoVO;
 import br.com.claudemirojr.sca.api.security.model.User;
 import br.com.claudemirojr.sca.api.security.repository.UserRepository;
@@ -129,9 +131,9 @@ public class SolicitacaoService implements ISolicitacaoService {
 
 		sistemaRepository.findById(solicitacaoVO.getSistema().getId()).orElseThrow(() -> new ResourceNotFoundException(
 				String.format("Sistema não encontrado para id %d", solicitacaoVO.getSistema().getId())));
-		
+
 		entity.Atualizar(solicitacaoVO.getDescricao(), solicitacaoVO.getCliente(), solicitacaoVO.getSistema());
-		
+
 		Solicitacao novaSolicitacao = solicitacaoRepository.save(entity);
 
 		var vo = DozerConverter.parseObject(novaSolicitacao, SolicitacaoVO.class);
@@ -144,7 +146,7 @@ public class SolicitacaoService implements ISolicitacaoService {
 	public SolicitacaoVO findById(Long id) {
 		var entity = solicitacaoRepository.findById(id).orElseThrow(
 				() -> new ResourceNotFoundException(String.format("Solicitação não encontrado para id %d", id)));
-	
+
 		if (userService.isAdmin()) {
 			return convertToSolicitacaoVO(entity);
 		} else {
@@ -152,24 +154,23 @@ public class SolicitacaoService implements ISolicitacaoService {
 
 			var user = useRepository.findByUserName(userName);
 			List<Sistema> sistemas = this.getSistemasDoUsuario(user);
-			
+
 			if (user.getVerOutraSolicitacao()) {
-				if ( sistemas.contains(entity.getSistema()) ){
+				if (sistemas.contains(entity.getSistema())) {
 					return convertToSolicitacaoVO(entity);
 				} else {
 					throw new ResourceNaoPermitidoException("Recursos não disponível para seu usuário!");
 				}
 			} else {
-				if ( entity.getUser().getId() == user.getId() ) {
+				if (entity.getUser().getId() == user.getId()) {
 					return convertToSolicitacaoVO(entity);
 				}
 			}
 		}
-			
+
 		throw new ResourceNaoPermitidoException("Recursos não disponível para seu usuário!");
 	}
-	
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public Page<SolicitacaoVO> findAll(ParamsRequestModel prm) {
@@ -249,6 +250,104 @@ public class SolicitacaoService implements ISolicitacaoService {
 		}
 
 		return sistemas;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<SolicitacaoVO> findByIdGreaterThanEqual(Long id, ParamsRequestModel prm) {
+		Pageable pageable = prm.toSpringPageRequest();
+
+		Page<Solicitacao> page = null;
+
+		if (userService.isAdmin()) {
+			page = solicitacaoRepository.findByIdGreaterThanEqual(id, pageable);
+		} else {
+			String userName = userService.getUsuarioLogado();
+
+			var user = useRepository.findByUserName(userName);
+
+			if (user.getVerOutraSolicitacao()) {
+				page = solicitacaoRepository.findByIdGreaterThanEqualAndSistemaIn(id, this.getSistemasDoUsuario(user),
+						pageable);
+			} else {
+				page = solicitacaoRepository.findByIdGreaterThanEqualAndUser(id, user, pageable);
+			}
+		}
+
+		return page.map(this::convertToSolicitacaoVO);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<SolicitacaoVO> findByDescricao(String descricao, ParamsRequestModel prm) {
+		Pageable pageable = prm.toSpringPageRequest();
+
+		Page<Solicitacao> page = null;
+
+		if (userService.isAdmin()) {
+			page = solicitacaoRepository.findByDescricaoIgnoreCaseContaining(descricao, pageable);
+		} else {
+			String userName = userService.getUsuarioLogado();
+
+			var user = useRepository.findByUserName(userName);
+
+			if (user.getVerOutraSolicitacao()) {
+				page = solicitacaoRepository.findByDescricaoIgnoreCaseContainingAndSistemaIn(descricao,
+						this.getSistemasDoUsuario(user), pageable);
+			} else {
+				page = solicitacaoRepository.findByDescricaoIgnoreCaseContainingAndUser(descricao, user, pageable);
+			}
+		}
+
+		return page.map(this::convertToSolicitacaoVO);
+	}
+
+	private MovimentacaoVO convertToMovimentacaoVO(SolicitacaoMovimentacao solicitacaoMovimentacao) {
+		MovimentacaoVO movimentacaoVO = new MovimentacaoVO();
+		movimentacaoVO.setKey(solicitacaoMovimentacao.getId());
+		movimentacaoVO.setStatus(solicitacaoMovimentacao.getStatus());
+		movimentacaoVO.setObservacao(solicitacaoMovimentacao.getObservacao());
+		movimentacaoVO.setCreatedDate( solicitacaoMovimentacao.getCreatedDate() );
+
+		return movimentacaoVO;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<MovimentacaoVO> findByMovimentacao(Long id) {
+		var entity = solicitacaoRepository.findById(id).orElseThrow(
+				() -> new ResourceNotFoundException(String.format("Solicitação não encontrado para id %d", id)));
+
+		List<SolicitacaoMovimentacao> result;
+		
+		if (userService.isAdmin()) {
+			result = solicitacaoMovimentacaoRepository.findBySolicitacao(entity);
+
+			return result.stream().map(this::convertToMovimentacaoVO).collect(Collectors.toList());
+		} else {
+			String userName = userService.getUsuarioLogado();
+
+			var user = useRepository.findByUserName(userName);
+			List<Sistema> sistemas = this.getSistemasDoUsuario(user);
+
+			if (user.getVerOutraSolicitacao()) {
+				if (sistemas.contains(entity.getSistema())) {
+					result = solicitacaoMovimentacaoRepository.findBySolicitacao(entity);
+
+					return result.stream().map(this::convertToMovimentacaoVO).collect(Collectors.toList());
+				} else {
+					throw new ResourceNaoPermitidoException("Recursos não disponível para seu usuário!");
+				}
+			} else {
+				if (entity.getUser().getId() == user.getId()) {
+					result = solicitacaoMovimentacaoRepository.findBySolicitacao(entity);
+
+					return result.stream().map(this::convertToMovimentacaoVO).collect(Collectors.toList());
+				}
+			}
+		}
+
+		throw new ResourceNaoPermitidoException("Recursos não disponível para seu usuário!");
 	}
 
 }
