@@ -215,7 +215,7 @@ public class FabricaService implements IFabricaService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public SolicitacaoFaseVO create(Long idSprint, Long idSolicitacao, SolicitacaoFaseVO solicitacaoFase) {
+	public SolicitacaoFaseVO createFase(Long idSprint, Long idSolicitacao, SolicitacaoFaseVO solicitacaoFase) {
 		var sprint = getSprint(idSprint);
 
 		var user = getUsuario();
@@ -233,12 +233,89 @@ public class FabricaService implements IFabricaService {
 
 		SolicitacaoFase newSolicitacaoFase = new SolicitacaoFase();
 		newSolicitacaoFase.Insert(solicitacao, fase, solicitacaoFase.getObservacao(), solicitacaoFase.getFinalizada());
-		
+
 		var entity = solicitacaoFaseRepositoy.save(newSolicitacaoFase);
 
 		var vo = DozerConverter.parseObject(entity, SolicitacaoFaseVO.class);
 
 		return vo;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public SolicitacaoFaseVO FindByFase(Long idSprint, Long idSolicitacao, Long idFase) {
+		var sprint = getSprint(idSprint);
+
+		var user = getUsuario();
+
+		getSprintDoUser(idSprint, user);
+
+		var solicitacao = solicitacaoRepository.findById(idSolicitacao).orElseThrow(() -> new ResourceNotFoundException(
+				String.format("Solicitação não encontrado para id %d", idSolicitacao)));
+
+		sprintSolicitacaoRepository.findBySolicitacaoAndSprint(solicitacao, sprint)
+				.orElseThrow(() -> new ResourceNotFoundException(
+						String.format("Sprint/Solicitação não encontrado para o conjunto")));
+
+		var entity = solicitacaoFaseRepositoy.findById(idFase).orElseThrow(() -> new ResourceNotFoundException(
+				String.format("Fase da Solicitação não encontrado para id %d", idFase)));
+
+		var vo = DozerConverter.parseObject(entity, SolicitacaoFaseVO.class);
+
+		return vo;
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public SolicitacaoFaseVO updateFase(Long idSprint, Long idSolicitacao, SolicitacaoFaseVO solicitacaoFase) {
+		var sprint = getSprint(idSprint);
+
+		var user = getUsuario();
+
+		getSprintDoUser(idSprint, user);
+
+		var solicitacao = solicitacaoRepository.findById(idSolicitacao).orElseThrow(() -> new ResourceNotFoundException(
+				String.format("Solicitação não encontrado para id %d", idSolicitacao)));
+
+		sprintSolicitacaoRepository.findBySolicitacaoAndSprint(solicitacao, sprint)
+				.orElseThrow(() -> new ResourceNotFoundException(
+						String.format("Sprint/Solicitação não encontrado para o conjunto")));
+
+		var fase = faseRepository.findById(solicitacaoFase.getFase().getId())
+				.orElseThrow(() -> new ResourceNotFoundException(
+						String.format("Fase não encontrado para id %d", solicitacaoFase.getFase().getId())));
+
+		var entity = solicitacaoFaseRepositoy.findById(solicitacaoFase.getFase().getId())
+				.orElseThrow(() -> new ResourceNotFoundException(String
+						.format("Fase da Solicitação não encontrado para id %d", solicitacaoFase.getFase().getId())));
+
+		entity.Atualizar(fase, solicitacaoFase.getObservacao(), solicitacaoFase.getFinalizada());
+
+		var vo = DozerConverter.parseObject(solicitacaoFaseRepositoy.save(entity), SolicitacaoFaseVO.class);
+
+		return vo;
+	}
+
+	@Override
+	public void deleteFase(Long idSprint, Long idSolicitacao, Long idFase) {
+		var sprint = getSprint(idSprint);
+
+		var user = getUsuario();
+
+		getSprintDoUser(idSprint, user);
+
+		var solicitacao = solicitacaoRepository.findById(idSolicitacao).orElseThrow(() -> new ResourceNotFoundException(
+				String.format("Solicitação não encontrado para id %d", idSolicitacao)));
+
+		sprintSolicitacaoRepository.findBySolicitacaoAndSprint(solicitacao, sprint)
+				.orElseThrow(() -> new ResourceNotFoundException(
+						String.format("Sprint/Solicitação não encontrado para o conjunto")));
+		
+		solicitacaoFaseRepositoy.findById(idFase)
+		.orElseThrow(() -> new ResourceNotFoundException(
+				String.format("Fase da solicitação não encontrado para id %d", idFase)));
+
+		solicitacaoFaseRepositoy.deleteById(idFase);
 	}
 
 }

@@ -12,9 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -101,27 +103,52 @@ public class FabricaController {
 
 	@Operation(summary = "procurar uma solicitação, que pertença ao time, específico pelo seu ID")
 	@GetMapping(value = "/sprint/{idSprint}/solicitacao/{idSolicitacao}")
-	public SolicitacaoVO findBySolicitacaoDaSprint(
-			@PathVariable("idSprint") Long idSprint,
+	public SolicitacaoVO findBySolicitacaoDaSprint(@PathVariable("idSprint") Long idSprint,
 			@PathVariable("idSolicitacao") Long idSolicitacao) {
 		SolicitacaoVO solicitacaoVO = service.findBySolicitacaoPorId(idSprint, idSolicitacao);
 
 		return solicitacaoVO;
 	}
-	
-	
+
 	@Operation(summary = "Criar uma nova fase da Solicitação")
 	@PostMapping("/sprint/{idSprint}/solicitacao/{idSolicitacao}")
-	public ResponseEntity<SolicitacaoFaseVO> create(
-			@PathVariable("idSprint") Long idSprint,
-			@PathVariable("idSolicitacao") Long idSolicitacao,			
-			@RequestBody @Valid SolicitacaoFaseVO solicitacaoFase) {
+	public ResponseEntity<SolicitacaoFaseVO> createFase(@PathVariable("idSprint") Long idSprint,
+			@PathVariable("idSolicitacao") Long idSolicitacao, @RequestBody @Valid SolicitacaoFaseVO solicitacaoFase) {
 
-		SolicitacaoFaseVO solicitacaoFaseVO = service.create(idSprint, idSolicitacao, solicitacaoFase);
+		SolicitacaoFaseVO solicitacaoFaseVO = service.createFase(idSprint, idSolicitacao, solicitacaoFase);
 
 		return new ResponseEntity<>(solicitacaoFaseVO, HttpStatus.CREATED);
 	}
 
-	
+	@Operation(summary = "procurar uma fase da solicitação específica pelo seu ID")
+	@GetMapping("/sprint/{idSprint}/solicitacao/{idSolicitacao}/fase/{idFase}")
+	public SolicitacaoFaseVO FindByFase(@PathVariable("idSprint") Long idSprint,
+			@PathVariable("idSolicitacao") Long idSolicitacao, @PathVariable("idFase") Long idFase) {
+
+		SolicitacaoFaseVO solicitacaoFaseVO = service.FindByFase(idSprint, idSolicitacao, idFase);
+
+		return solicitacaoFaseVO;
+	}
+
+	@Operation(summary = "Atualizar uma fase específica da solicitação")
+	@PutMapping("/sprint/{idSprint}/solicitacao/{idSolicitacao}")
+	public ResponseEntity<SolicitacaoFaseVO> updateFase(@PathVariable("idSprint") Long idSprint,
+			@PathVariable("idSolicitacao") Long idSolicitacao, @RequestBody @Valid SolicitacaoFaseVO solicitacaoFase) {
+
+		SolicitacaoFaseVO solicitacaoFaseVO = service.updateFase(idSprint, idSolicitacao, solicitacaoFase);
+
+		return new ResponseEntity<>(solicitacaoFaseVO, HttpStatus.OK);
+	}
+
+	@Operation(summary = "Deletar uma fase específica da solicitação")
+	@DeleteMapping("/sprint/{idSprint}/solicitacao/{idSolicitacao}/fase/{idFase}")
+	public ResponseEntity<?> deleteFase(
+			@PathVariable("idSprint") Long idSprint,
+			@PathVariable("idSolicitacao") Long idSolicitacao, 
+			@PathVariable("idFase") Long idFase) {
+		service.deleteFase(idSprint, idSolicitacao, idFase);
+
+		return ResponseEntity.ok().build();
+	}
 
 }

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.claudemirojr.sca.api.exception.ResourceInvalidException;
 import br.com.claudemirojr.sca.api.exception.ResourceNotFoundException;
 import br.com.claudemirojr.sca.api.model.ParamsRequestModel;
 import br.com.claudemirojr.sca.api.model.entity.SolicitacaoMovimentacao;
@@ -49,12 +50,17 @@ public class SprintSolicitacaoService implements ISprintSolicitacaoService {
 	@Override
 	@Transactional(readOnly = false)
 	public void addSolicitacaoASprint(Long idSolicitacao, Long idSprint) {
+		var sprint = sprintRepository.findById(idSprint).orElseThrow(
+				() -> new ResourceNotFoundException(String.format("Sprint não encontrado para id %d", idSprint)));
+
+		if (sprint.getDataEncaminhamentoAoTime() != null) {
+			throw new ResourceInvalidException(
+					"Sprint " + sprint.getId() + " já encaminhado ao time, operação não permitida!");
+		}
+
 		var solicitacao = solicitacaoRepository.findById(idSolicitacao).orElseThrow(() -> new ResourceNotFoundException(
 				String.format("Solicitação não encontrado para id %d", idSolicitacao)));
 
-		var sprint = sprintRepository.findById(idSprint).orElseThrow(
-				() -> new ResourceNotFoundException(String.format("Sprint não encontrado para id %d", idSprint)));
-		
 		if ((solicitacao.getStatusAtual() == SolicitacaoStatus.ANALISADA)
 				|| (solicitacao.getStatusAtual() == SolicitacaoStatus.PLANEJADA)) {
 
@@ -82,13 +88,17 @@ public class SprintSolicitacaoService implements ISprintSolicitacaoService {
 	@Override
 	@Transactional(readOnly = false)
 	public void deleteSistemaDoCliente(Long idSolicitacao, Long idSprint) {
-		var solicitacao = solicitacaoRepository.findById(idSolicitacao).orElseThrow(() -> new ResourceNotFoundException(
-				String.format("Solicitação não encontrado para id %d", idSolicitacao)));
-
 		var sprint = sprintRepository.findById(idSprint).orElseThrow(
 				() -> new ResourceNotFoundException(String.format("Sprint não encontrado para id %d", idSprint)));
 
-		
+		if (sprint.getDataEncaminhamentoAoTime() != null) {
+			throw new ResourceInvalidException(
+					"Sprint " + sprint.getId() + " já encaminhado ao time, operação não permitida!");
+		}
+
+		var solicitacao = solicitacaoRepository.findById(idSolicitacao).orElseThrow(() -> new ResourceNotFoundException(
+				String.format("Solicitação não encontrado para id %d", idSolicitacao)));
+
 		var entity = sprintSolicitacaoRepository.findBySolicitacaoAndSprint(solicitacao, sprint)
 				.orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Sprint/Solicitação: Não encontrado para o conjunto")));

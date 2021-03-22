@@ -72,5 +72,12 @@ public class SolicitacaoFase implements Serializable {
 		this.observacao = observacao;
 		this.finalizada = finalizada;
 	}
+	
+	public void Atualizar(Fase fase, String observacao, Boolean finalizada) {
+		this.fase = fase;
+		this.observacao = observacao;
+		this.finalizada = finalizada;
+	}
+	
 
 }

@@ -23,6 +23,15 @@ public interface IFabricaService {
 	public Page<SolicitacaoFaseVO> FindBySprintSolicitacaoFase(Long idSprint, Long idSolicitacao,
 			ParamsRequestModel prm);
 	
-	public SolicitacaoFaseVO create(Long idSprint, Long idSolicitacao, SolicitacaoFaseVO solicitacaoFase);
+	
+	public SolicitacaoFaseVO createFase(Long idSprint, Long idSolicitacao, SolicitacaoFaseVO solicitacaoFase);
+	
+	public SolicitacaoFaseVO FindByFase(Long idSprint, Long idSolicitacao, Long idFase);
+	
+	public SolicitacaoFaseVO updateFase(Long idSprint, Long idSolicitacao, SolicitacaoFaseVO solicitacaoFase);
+	
+	public void deleteFase(Long idSprint, Long idSolicitacao, Long idFase);
+	
+	
 	
 }
