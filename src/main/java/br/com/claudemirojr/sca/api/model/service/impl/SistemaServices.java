@@ -28,6 +28,8 @@ public class SistemaServices implements ISistemaService {
 	@Transactional(readOnly = false)
 	public SistemaVO create(SistemaVO sistemaVo) {
 		var entity = DozerConverter.parseObject(sistemaVo, Sistema.class);
+		entity.setId(null);
+
 		var vo = DozerConverter.parseObject(sistemaRepository.save(entity), SistemaVO.class);
 		return vo;
 	}

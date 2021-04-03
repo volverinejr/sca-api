@@ -10,11 +10,11 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.CreatedBy;
@@ -53,7 +53,9 @@ public class Solicitacao implements Serializable {
 	}
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	// @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(generator = "increment")
+	@GenericGenerator(name = "increment", strategy = "increment")
 	private Long id;
 
 	@Column(length = 2000, nullable = false)
@@ -96,30 +98,26 @@ public class Solicitacao implements Serializable {
 	@JsonIgnore
 	private Date lastModifiedDate;
 	// -------AUDITORIA
-	
-	
+
 	public void InformarUser(User user) {
 		this.user = user;
 		this.cliente = user.getCliente();
 		this.statusAtual = SolicitacaoStatus.CADASTRADA;
 	}
-	
+
 	public void Atualizar(String descricao, Cliente cliente, Sistema sistema) {
 		this.descricao = descricao;
 		this.cliente = cliente;
 		this.sistema = sistema;
 	}
-	
+
 	public void Analise(Integer prioridade) {
 		this.prioridade = prioridade;
 		this.statusAtual = SolicitacaoStatus.ANALISADA;
 	}
-	
+
 	public void Planejada() {
 		this.statusAtual = SolicitacaoStatus.PLANEJADA;
 	}
-	
-	
-
 
 }

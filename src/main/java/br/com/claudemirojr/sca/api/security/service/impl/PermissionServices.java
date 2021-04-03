@@ -28,6 +28,8 @@ public class PermissionServices implements IPermissionService {
 	@Transactional(readOnly = false)
 	public PermissionVO create(PermissionVO permissionVo) {
 		var entity = DozerConverter.parseObject(permissionVo, Permission.class);
+		entity.setId(null);
+
 		var vo = DozerConverter.parseObject(permissionRepository.save(entity), PermissionVO.class);
 		return vo;
 	}

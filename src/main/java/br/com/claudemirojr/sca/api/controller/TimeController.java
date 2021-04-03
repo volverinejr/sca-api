@@ -23,7 +23,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.claudemirojr.sca.api.model.ParamsRequestModel;
-import br.com.claudemirojr.sca.api.model.service.ITimeService;
+import br.com.claudemirojr.sca.api.model.service.time.ITimeCreateService;
+import br.com.claudemirojr.sca.api.model.service.time.ITimeDeleteService;
+import br.com.claudemirojr.sca.api.model.service.time.ITimeReadService;
+import br.com.claudemirojr.sca.api.model.service.time.ITimeUpdateService;
 import br.com.claudemirojr.sca.api.model.vo.TimeVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,14 +37,25 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class TimeController {
 
 	@Autowired
-	private ITimeService service;
+	private ITimeCreateService timeCreateService;
+	
+	@Autowired
+	private ITimeUpdateService timeUpdateService;
+	
+	@Autowired
+	private ITimeDeleteService timeDeleteService;
+	
+	@Autowired
+	private ITimeReadService timeReadService;
+	
+	
 
 	@Operation(summary = "Criar um novo Time")
 	@PostMapping
 	@PreAuthorize("hasAnyRole('ADMIN', 'TIME_ALL', 'TIME_NEW')")
 	public ResponseEntity<TimeVO> create(@RequestBody @Valid TimeVO time) {
 
-		TimeVO timeVO = service.create(time);
+		TimeVO timeVO = timeCreateService.create(time);
 
 		timeVO.add(linkTo(methodOn(TimeController.class).findById(timeVO.getKey())).withSelfRel());
 
@@ -53,7 +67,7 @@ public class TimeController {
 	@PreAuthorize("hasAnyRole('ADMIN', 'TIME_ALL', 'TIME_UPDATE')")
 	public ResponseEntity<TimeVO> update(@RequestBody @Valid TimeVO time) {
 
-		TimeVO timeVO = service.update(time);
+		TimeVO timeVO = timeUpdateService.update(time);
 
 		timeVO.add(linkTo(methodOn(TimeController.class).findById(timeVO.getKey())).withSelfRel());
 
@@ -64,7 +78,7 @@ public class TimeController {
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'TIME_ALL', 'TIME_DELETE')")
 	public ResponseEntity<?> delete(@PathVariable("id") Long id) {
-		service.delete(id);
+		timeDeleteService.delete(id);
 
 		return ResponseEntity.ok().build();
 	}
@@ -75,7 +89,7 @@ public class TimeController {
 	public ResponseEntity<?> findAll(@RequestParam Map<String, String> params) {
 		ParamsRequestModel prm = new ParamsRequestModel(params);
 
-		Page<TimeVO> times = service.findAll(prm);
+		Page<TimeVO> times = timeReadService.findAll(prm);
 
 		times.stream().forEach(p -> p.add(linkTo(methodOn(TimeController.class).findById(p.getKey())).withSelfRel()));
 
@@ -88,7 +102,7 @@ public class TimeController {
 	public ResponseEntity<?> findByIdGreaterThanEqual(@PathVariable Long id, @RequestParam Map<String, String> params) {
 		ParamsRequestModel prm = new ParamsRequestModel(params);
 
-		Page<TimeVO> times = service.findByIdGreaterThanEqual(id, prm);
+		Page<TimeVO> times = timeReadService.findByIdGreaterThanEqual(id, prm);
 
 		times.stream().forEach(p -> p.add(linkTo(methodOn(TimeController.class).findById(p.getKey())).withSelfRel()));
 
@@ -101,7 +115,7 @@ public class TimeController {
 	public ResponseEntity<?> findByNome(@PathVariable String nome, @RequestParam Map<String, String> params) {
 		ParamsRequestModel prm = new ParamsRequestModel(params);
 
-		Page<TimeVO> times = service.findByNome(nome, prm);
+		Page<TimeVO> times = timeReadService.findByNome(nome, prm);
 
 		times.stream().forEach(p -> p.add(linkTo(methodOn(TimeController.class).findById(p.getKey())).withSelfRel()));
 
@@ -112,7 +126,7 @@ public class TimeController {
 	@GetMapping(value = "/{id}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'TIME_ALL', 'TIME_DETALHE', 'TIME_UPDATE')")
 	public TimeVO findById(@PathVariable("id") Long id) {
-		TimeVO timeVO = service.findById(id);
+		TimeVO timeVO = timeReadService.findById(id);
 		timeVO.add(linkTo(methodOn(TimeController.class).findById(id)).withSelfRel());
 		return timeVO;
 	}

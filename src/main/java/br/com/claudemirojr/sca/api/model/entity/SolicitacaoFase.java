@@ -8,12 +8,12 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.CreatedBy;
@@ -39,7 +39,9 @@ public class SolicitacaoFase implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	// @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(generator = "increment")
+	@GenericGenerator(name = "increment", strategy = "increment")
 	private Long id;
 
 	@OneToOne(fetch = FetchType.LAZY)
@@ -72,12 +74,11 @@ public class SolicitacaoFase implements Serializable {
 		this.observacao = observacao;
 		this.finalizada = finalizada;
 	}
-	
+
 	public void Atualizar(Fase fase, String observacao, Boolean finalizada) {
 		this.fase = fase;
 		this.observacao = observacao;
 		this.finalizada = finalizada;
 	}
-	
 
 }

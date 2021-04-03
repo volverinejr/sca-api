@@ -85,6 +85,7 @@ public class SolicitacaoService implements ISolicitacaoService {
 				String.format("Sistema não encontrado para id %d", solicitacaoVO.getSistema().getId())));
 
 		var entity = DozerConverter.parseObject(solicitacaoVO, Solicitacao.class);
+		entity.setId(null);
 
 		var user = useRepository.findByUserName(userService.getUsuarioLogado());
 		if (user == null) {

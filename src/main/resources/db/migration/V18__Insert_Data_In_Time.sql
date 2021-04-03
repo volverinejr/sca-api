@@ -1,8 +1,8 @@
-﻿INSERT INTO `time` (`nome`, `ativo`, `created_by`, `created_date`) 
-VALUES ('Dev Multas', 1, 'Automático', NOW() );
+﻿INSERT INTO time (id, nome, ativo, created_by, created_date) 
+VALUES (1, 'Dev Multas', true, 'Automático', NOW() );
 
-﻿INSERT INTO `time` (`nome`, `ativo`, `created_by`, `created_date`) 
-VALUES ('Dev Protocolo', 1, 'Automático', NOW() );
+﻿INSERT INTO time (id, nome, ativo, created_by, created_date) 
+VALUES (2, 'Dev Protocolo', true, 'Automático', NOW() );
 
-﻿INSERT INTO `time` (`nome`, `ativo`, `created_by`, `created_date`) 
-VALUES ('Dev NOA', 1, 'Automático', NOW() );
+﻿INSERT INTO time (id, nome, ativo, created_by, created_date) 
+VALUES (3, 'Dev NOA', true, 'Automático', NOW() );

@@ -8,12 +8,12 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.CreatedBy;
@@ -30,7 +30,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Table(name = "user_cliente_sistema", uniqueConstraints = @UniqueConstraint(columnNames = { "user_id", "cliente_sistema_id" }))
+@Table(name = "user_cliente_sistema", uniqueConstraints = @UniqueConstraint(columnNames = { "user_id",
+		"cliente_sistema_id" }))
 @Entity
 @Audited
 @AuditTable(value = "user_cliente_sistema_audit")
@@ -40,7 +41,9 @@ public class UserClienteSistema implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	// @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(generator = "increment")
+	@GenericGenerator(name = "increment", strategy = "increment")
 	private Long id;
 
 	@OneToOne(fetch = FetchType.LAZY)
@@ -52,13 +55,13 @@ public class UserClienteSistema implements Serializable {
 	// -------AUDITORIA
 	@Column(name = "created_by")
 	@CreatedBy
-    @JsonIgnore
+	@JsonIgnore
 	private String createdBy;
 
 	@Column(name = "created_date", nullable = false, updatable = false)
 	@CreatedDate
-    @JsonIgnore
+	@JsonIgnore
 	private Date createdDate;
 	// -------AUDITORIA
-	
+
 }

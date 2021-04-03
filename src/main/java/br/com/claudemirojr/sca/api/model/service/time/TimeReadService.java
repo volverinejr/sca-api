@@ -1,4 +1,4 @@
-package br.com.claudemirojr.sca.api.model.service.impl;
+package br.com.claudemirojr.sca.api.model.service.time;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,45 +11,16 @@ import br.com.claudemirojr.sca.api.exception.ResourceNotFoundException;
 import br.com.claudemirojr.sca.api.model.ParamsRequestModel;
 import br.com.claudemirojr.sca.api.model.entity.Time;
 import br.com.claudemirojr.sca.api.model.repository.TimeRepository;
-import br.com.claudemirojr.sca.api.model.service.ITimeService;
 import br.com.claudemirojr.sca.api.model.vo.TimeVO;
 
 @Service
-public class TimeServices implements ITimeService {
+public class TimeReadService implements ITimeReadService {
 
 	@Autowired
 	private TimeRepository timeRepository;
 
 	private TimeVO convertToTimeVO(Time entity) {
 		return DozerConverter.parseObject(entity, TimeVO.class);
-	}
-
-	@Override
-	@Transactional(readOnly = false)
-	public TimeVO create(TimeVO timeVo) {
-		var entity = DozerConverter.parseObject(timeVo, Time.class);
-		var vo = DozerConverter.parseObject(timeRepository.save(entity), TimeVO.class);
-		return vo;
-	}
-
-	@Override
-	@Transactional(readOnly = false)
-	public TimeVO update(TimeVO timeVo) {
-		var entity = timeRepository.findById(timeVo.getKey()).orElseThrow(
-				() -> new ResourceNotFoundException(String.format("Time não encontrado para id %d", timeVo.getKey())));
-
-		entity.Atualizar(timeVo.getNome(), timeVo.getAtivo());
-
-		var vo = DozerConverter.parseObject(timeRepository.save(entity), TimeVO.class);
-		return vo;
-	}
-
-	@Override
-	@Transactional(readOnly = false)
-	public void delete(Long id) {
-		Time entity = timeRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException(String.format("Time não encontrado para id %d", id)));
-		timeRepository.delete(entity);
 	}
 
 	@Override

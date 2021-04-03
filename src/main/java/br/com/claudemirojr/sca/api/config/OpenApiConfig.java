@@ -15,7 +15,7 @@ public class OpenApiConfig {
 	public OpenAPI customOpenApi() {
 		return new OpenAPI()
 		        .info(new Info()
-		                .title("RESTful API With Java 11 and Spring Boot 2.4.2")
+		                .title("RESTfull API With Java 11 and Spring Boot 2.4.4")
 		                .version("v1")
 		                .description("Some description about your API.")
 		                .termsOfService("http://swagger.io/terms/")

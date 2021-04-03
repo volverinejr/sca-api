@@ -63,6 +63,7 @@ public class SprintServices implements ISprintService {
 	@Transactional(readOnly = false)
 	public SprintVO create(SprintVO sprintVo) {
 		var entity = DozerConverter.parseObject(sprintVo, Sprint.class);
+		entity.setId(null);
 
 		var vo = DozerConverter.parseObject(sprintRepository.save(entity), SprintVO.class);
 

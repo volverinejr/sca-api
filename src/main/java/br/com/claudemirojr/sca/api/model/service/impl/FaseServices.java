@@ -28,6 +28,8 @@ public class FaseServices implements IFaseService {
 	@Transactional(readOnly = false)
 	public FaseVO create(FaseVO faseVo) {
 		var entity = DozerConverter.parseObject(faseVo, Fase.class);
+		entity.setId(null);
+
 		var vo = DozerConverter.parseObject(faseRepository.save(entity), FaseVO.class);
 		return vo;
 	}

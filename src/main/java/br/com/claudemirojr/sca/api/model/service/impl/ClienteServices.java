@@ -28,6 +28,8 @@ public class ClienteServices implements IClienteService {
 	@Transactional(readOnly = false)
 	public ClienteVO create(ClienteVO clienteVo) {
 		var entity = DozerConverter.parseObject(clienteVo, Cliente.class);
+		entity.setId(null);
+
 		var vo = DozerConverter.parseObject(clienteRepository.save(entity), ClienteVO.class);
 		return vo;
 	}

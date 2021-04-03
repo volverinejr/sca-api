@@ -11,7 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -20,6 +19,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
@@ -50,8 +50,10 @@ public class User implements UserDetails, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	// @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
+	@GeneratedValue(generator = "increment")
+	@GenericGenerator(name = "increment", strategy = "increment")
 	private Long id;
 
 	@Column(name = "user_name", unique = true)
@@ -59,7 +61,7 @@ public class User implements UserDetails, Serializable {
 
 	@Column(name = "full_name")
 	private String fullName;
-	
+
 	@Column(unique = true)
 	private String email;
 
@@ -90,31 +92,27 @@ public class User implements UserDetails, Serializable {
 	@NotAudited
 	private List<Permission> permissions;
 
-	
-	
 	// -------AUDITORIA
 	@Column(name = "created_by")
 	@CreatedBy
-    @JsonIgnore
+	@JsonIgnore
 	private String createdBy;
 
 	@Column(name = "created_date", nullable = false, updatable = false)
 	@CreatedDate
-    @JsonIgnore
+	@JsonIgnore
 	private Date createdDate;
 
 	@Column(name = "last_modified_by")
 	@LastModifiedBy
-    @JsonIgnore
+	@JsonIgnore
 	private String lastModifiedBy;
 
 	@Column(name = "last_modified_date")
 	@LastModifiedDate
-    @JsonIgnore
+	@JsonIgnore
 	private Date lastModifiedDate;
 	// -------AUDITORIA
-	
-	
 
 	public List<String> getRoles() {
 		List<String> roles = new ArrayList<>();
@@ -124,7 +122,8 @@ public class User implements UserDetails, Serializable {
 		return roles;
 	}
 
-	public void Atualizar(String userName, String fullName, Boolean enabled, Boolean verOutraSolicitacao, String email, Cliente cliente) {
+	public void Atualizar(String userName, String fullName, Boolean enabled, Boolean verOutraSolicitacao, String email,
+			Cliente cliente) {
 		this.userName = userName;
 		this.fullName = fullName;
 		this.enabled = enabled;
@@ -236,7 +235,7 @@ public class User implements UserDetails, Serializable {
 	public boolean isEnabled() {
 		return this.enabled;
 	}
-	
+
 	public Boolean getVerOutraSolicitacao() {
 		return verOutraSolicitacao;
 	}
@@ -252,7 +251,7 @@ public class User implements UserDetails, Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+
 	public Cliente getCliente() {
 		return cliente;
 	}
@@ -260,10 +259,7 @@ public class User implements UserDetails, Serializable {
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
 	}
-	
-	
-	
-	
+
 	@PrePersist
 	public void prePersist() {
 		this.accountNonExpired = true;
@@ -272,81 +268,40 @@ public class User implements UserDetails, Serializable {
 	}
 
 	/*
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((accountNonExpired == null) ? 0 : accountNonExpired.hashCode());
-		result = prime * result + ((accountNonLocked == null) ? 0 : accountNonLocked.hashCode());
-		result = prime * result + ((credentialsNonExpired == null) ? 0 : credentialsNonExpired.hashCode());
-		result = prime * result + ((enabled == null) ? 0 : enabled.hashCode());
-		result = prime * result + ((fullName == null) ? 0 : fullName.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((password == null) ? 0 : password.hashCode());
-		result = prime * result + ((permissions == null) ? 0 : permissions.hashCode());
-		result = prime * result + ((userName == null) ? 0 : userName.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		User other = (User) obj;
-		if (accountNonExpired == null) {
-			if (other.accountNonExpired != null)
-				return false;
-		} else if (!accountNonExpired.equals(other.accountNonExpired))
-			return false;
-		if (accountNonLocked == null) {
-			if (other.accountNonLocked != null)
-				return false;
-		} else if (!accountNonLocked.equals(other.accountNonLocked))
-			return false;
-		if (credentialsNonExpired == null) {
-			if (other.credentialsNonExpired != null)
-				return false;
-		} else if (!credentialsNonExpired.equals(other.credentialsNonExpired))
-			return false;
-		if (enabled == null) {
-			if (other.enabled != null)
-				return false;
-		} else if (!enabled.equals(other.enabled))
-			return false;
-		if (fullName == null) {
-			if (other.fullName != null)
-				return false;
-		} else if (!fullName.equals(other.fullName))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (password == null) {
-			if (other.password != null)
-				return false;
-		} else if (!password.equals(other.password))
-			return false;
-		if (permissions == null) {
-			if (other.permissions != null)
-				return false;
-		} else if (!permissions.equals(other.permissions))
-			return false;
-		if (userName == null) {
-			if (other.userName != null)
-				return false;
-		} else if (!userName.equals(other.userName))
-			return false;
-		return true;
-	}
-	*/
-	
-
+	 * @Override public int hashCode() { final int prime = 31; int result = 1;
+	 * result = prime * result + ((accountNonExpired == null) ? 0 :
+	 * accountNonExpired.hashCode()); result = prime * result + ((accountNonLocked
+	 * == null) ? 0 : accountNonLocked.hashCode()); result = prime * result +
+	 * ((credentialsNonExpired == null) ? 0 : credentialsNonExpired.hashCode());
+	 * result = prime * result + ((enabled == null) ? 0 : enabled.hashCode());
+	 * result = prime * result + ((fullName == null) ? 0 : fullName.hashCode());
+	 * result = prime * result + ((id == null) ? 0 : id.hashCode()); result = prime
+	 * * result + ((password == null) ? 0 : password.hashCode()); result = prime *
+	 * result + ((permissions == null) ? 0 : permissions.hashCode()); result = prime
+	 * * result + ((userName == null) ? 0 : userName.hashCode()); return result; }
+	 * 
+	 * @Override public boolean equals(Object obj) { if (this == obj) return true;
+	 * if (obj == null) return false; if (getClass() != obj.getClass()) return
+	 * false; User other = (User) obj; if (accountNonExpired == null) { if
+	 * (other.accountNonExpired != null) return false; } else if
+	 * (!accountNonExpired.equals(other.accountNonExpired)) return false; if
+	 * (accountNonLocked == null) { if (other.accountNonLocked != null) return
+	 * false; } else if (!accountNonLocked.equals(other.accountNonLocked)) return
+	 * false; if (credentialsNonExpired == null) { if (other.credentialsNonExpired
+	 * != null) return false; } else if
+	 * (!credentialsNonExpired.equals(other.credentialsNonExpired)) return false; if
+	 * (enabled == null) { if (other.enabled != null) return false; } else if
+	 * (!enabled.equals(other.enabled)) return false; if (fullName == null) { if
+	 * (other.fullName != null) return false; } else if
+	 * (!fullName.equals(other.fullName)) return false; if (id == null) { if
+	 * (other.id != null) return false; } else if (!id.equals(other.id)) return
+	 * false; if (password == null) { if (other.password != null) return false; }
+	 * else if (!password.equals(other.password)) return false; if (permissions ==
+	 * null) { if (other.permissions != null) return false; } else if
+	 * (!permissions.equals(other.permissions)) return false; if (userName == null)
+	 * { if (other.userName != null) return false; } else if
+	 * (!userName.equals(other.userName)) return false; return true; }
+	 */
 
 	@Override
 	public int hashCode() {
@@ -462,7 +417,5 @@ public class User implements UserDetails, Serializable {
 			return false;
 		return true;
 	}
-	
-	
-	
+
 }
