@@ -17,7 +17,7 @@ public class OpenApiConfig {
 		        .info(new Info()
 		                .title("RESTfull API With Java 11 and Spring Boot 2.4.4")
 		                .version("v1")
-		                .description("Some description about your API.")
+		                .description("Sistema de Controle de Atendimento")
 		                .termsOfService("http://swagger.io/terms/")
 		                .license(new License().name("Apache 2.0").url("http://springdoc.org")));
 	}
