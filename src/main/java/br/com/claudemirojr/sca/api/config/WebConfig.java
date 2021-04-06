@@ -9,7 +9,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
-		.allowedOrigins("http://localhost:3000", "http://localhost:4200", "http://localhost")
+		.allowedOrigins("https://sca-front.herokuapp.com", "http://localhost:4200")
 		.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT");
 	}
 }
