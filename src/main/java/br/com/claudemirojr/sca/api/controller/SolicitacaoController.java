@@ -131,7 +131,8 @@ public class SolicitacaoController {
 
 	@Operation(summary = "Find all Clientes do Usuário logado, por páginas")
 	@GetMapping("/cliente/{id}/sistemas")
-	public ResponseEntity<?> FindBySistemasDoCliente(@PathVariable("id") Long id,
+	public ResponseEntity<?> FindBySistemasDoCliente(
+			@PathVariable("id") Long id,
 			@RequestParam Map<String, String> params) {
 		ParamsRequestModel prm = new ParamsRequestModel(params);
 

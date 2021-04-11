@@ -22,8 +22,8 @@ public interface ClienteSistemaRepository extends JpaRepository<ClienteSistema, 
 			value = "SELECT 	a.id,\n"
 					+ "			a.nome,\n"
 					+ "			case\n"
-					+ "				when sis_cli.id IS NULL then false \n"
-					+ "				ELSE true \n"
+					+ "				when sis_cli.id IS NULL then 0 \n"
+					+ "				ELSE 1 \n"
 					+ "			END AS cadastrado \n"
 					+ "FROM sistema AS a\n"
 					+ "		LEFT JOIN (\n"
@@ -39,7 +39,7 @@ public interface ClienteSistemaRepository extends JpaRepository<ClienteSistema, 
 	
 	
 	@Query(
-			value = "SELECT CAST(s.id AS CHAR) AS id,\n"
+			value = "SELECT s.id,\n"
 					+ "		s.nome,\n"
 					+ "		s.ativo\n"
 					+ "FROM user_cliente_sistema AS ucs\n"
