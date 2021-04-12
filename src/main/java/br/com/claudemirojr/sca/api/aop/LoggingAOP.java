@@ -11,19 +11,19 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import br.com.claudemirojr.sca.api.security.service.impl.UserServices;
+import br.com.claudemirojr.sca.api.model.entity.Pesquisa;
+import br.com.claudemirojr.sca.api.model.service.IPesquisaService;
 
 @Aspect
 @Component
 public class LoggingAOP {
 
 	Logger log = LoggerFactory.getLogger(LoggingAOP.class);
-	
-	@Autowired
-	private UserServices userServices;
-	
 
-	@Pointcut(value = "execution(* br.com.claudemirojr.sca.api.controller.*.*(..) )")
+	@Autowired
+	private IPesquisaService pesquisaService;
+
+	@Pointcut(value = "execution(* br.com.claudemirojr.sca.api.controller.*.findBy*(..) )")
 	public void myPointcut() {
 
 	}
@@ -35,15 +35,20 @@ public class LoggingAOP {
 		String className = pjp.getTarget().getClass().toString();
 		String methodName = pjp.getSignature().getName();
 		Object[] array = pjp.getArgs();
+		String argumento = mapper.writeValueAsString(array);
 
-		log.info("Usuário: " + userServices.getUsuarioLogado());
-		
-		log.info("Método chamado: " + className + "." + methodName + "()" + " argumentos: "
-				+ mapper.writeValueAsString(array));
+		// log.info("Método chamado: " + className + "." + methodName + "()" + "
+		// argumentos: " + argumento);
 
 		Object object = pjp.proceed();
-		
-		log.info(className + "." + methodName + "()" + " Response: " + mapper.writeValueAsString(object));
+
+		String retorno = mapper.writeValueAsString(object);
+
+		// log.info(className + "." + methodName + "()" + " Response: " + retorno);
+
+		Pesquisa pesquisa = new Pesquisa();
+		pesquisa.Novo(className, methodName, argumento, retorno);
+		pesquisaService.create(pesquisa);
 
 		return object;
 	}
