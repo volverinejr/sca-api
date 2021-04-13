@@ -13,12 +13,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.claudemirojr.sca.api.model.entity.Pesquisa;
 import br.com.claudemirojr.sca.api.model.service.IPesquisaService;
+import br.com.claudemirojr.sca.api.security.service.IUserService;
 
 @Aspect
 @Component
 public class LoggingAOP {
 
 	Logger log = LoggerFactory.getLogger(LoggingAOP.class);
+
+	@Autowired
+	private IUserService userService;
 
 	@Autowired
 	private IPesquisaService pesquisaService;
@@ -37,19 +41,24 @@ public class LoggingAOP {
 		Object[] array = pjp.getArgs();
 		String argumento = mapper.writeValueAsString(array);
 
-		// log.info("Método chamado: " + className + "." + methodName + "()" + "
-		// argumentos: " + argumento);
+		if (!className.contains("PesquisaController")) {
+			// log.info("Método chamado: " + className + "." + methodName + "()" + "
+			// argumentos: " + argumento);
 
-		Object object = pjp.proceed();
+			Object object = pjp.proceed();
 
-		String retorno = mapper.writeValueAsString(object);
+			String retorno = mapper.writeValueAsString(object);
 
-		// log.info(className + "." + methodName + "()" + " Response: " + retorno);
+			// log.info(className + "." + methodName + "()" + " Response: " + retorno);
 
-		Pesquisa pesquisa = new Pesquisa();
-		pesquisa.Novo(className, methodName, argumento, retorno);
-		pesquisaService.create(pesquisa);
+			Pesquisa pesquisa = new Pesquisa();
+			pesquisa.Novo(className, methodName, argumento, retorno, userService.getUsuarioLogado());
+			pesquisaService.create(pesquisa);
 
-		return object;
+			return object;
+		} else {
+			return null;
+		}
+
 	}
 }
