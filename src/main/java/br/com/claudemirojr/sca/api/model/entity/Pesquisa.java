@@ -43,15 +43,13 @@ public class Pesquisa implements Serializable {
 
 	// -------AUDITORIA
 	@Column(name = "created_by")
-	// @CreatedBy
-	//@JsonIgnore
 	private String createdBy;
 
 	@Column(name = "created_date", nullable = false, updatable = false)
-	// @CreatedDate
-	//@JsonIgnore
 	private Date createdDate;
 	// -------AUDITORIA
+	
+	
 
 	public void Novo(String className, String methodName, String argumento, String retorno, String createdBy) {
 		this.className = className;
