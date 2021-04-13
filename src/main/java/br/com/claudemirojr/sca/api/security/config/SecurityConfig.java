@@ -39,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		.and()
 			.authorizeRequests()
-			.antMatchers("/actuator/**").access("hasIpAddress('192.168.0.89:8080')")
+			//.antMatchers("/actuator/**").access("hasIpAddress('192.168.0.89:8080')")
 			
 			.antMatchers("/auth/signin", "/api-docs/**", "/swagger-ui.html**").permitAll()
 			.antMatchers("/api/**").authenticated()
