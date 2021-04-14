@@ -285,7 +285,7 @@ public class FabricaService implements IFabricaService {
 				.orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Fase não encontrado para id %d", solicitacaoFase.getFase().getId())));
 
-		var entity = solicitacaoFaseRepositoy.findById(solicitacaoFase.getFase().getId())
+		var entity = solicitacaoFaseRepositoy.findById( solicitacaoFase.getKey() )
 				.orElseThrow(() -> new ResourceNotFoundException(String
 						.format("Fase da Solicitação não encontrado para id %d", solicitacaoFase.getFase().getId())));
 
