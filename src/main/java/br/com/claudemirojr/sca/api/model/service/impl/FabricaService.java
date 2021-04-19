@@ -2,6 +2,7 @@ package br.com.claudemirojr.sca.api.model.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ import br.com.claudemirojr.sca.api.model.vo.SolicitacaoFaseVO;
 import br.com.claudemirojr.sca.api.model.vo.SolicitacaoVO;
 import br.com.claudemirojr.sca.api.model.vo.SprintVO;
 import br.com.claudemirojr.sca.api.security.model.User;
+import br.com.claudemirojr.sca.api.security.model.vo.UserVO;
 import br.com.claudemirojr.sca.api.security.repository.UserRepository;
 import br.com.claudemirojr.sca.api.security.service.IUserService;
 
@@ -65,6 +67,14 @@ public class FabricaService implements IFabricaService {
 	}
 
 	private SolicitacaoFaseVO convertToSolicitacaoFaseVO(SolicitacaoFase entity) {
+
+		//var user = useRepository.findById(entity.getResponsavel().getId()).get();
+
+		//entity.setResponsavel(null);
+
+		// SolicitacaoFase solicitacaoFase = new SolicitacaoFase();
+		// solicitacaoFase.setId(null);
+
 		return DozerConverter.parseObject(entity, SolicitacaoFaseVO.class);
 	}
 
@@ -75,6 +85,10 @@ public class FabricaService implements IFabricaService {
 		result.setUserName(entity.getSolicitacao().getUser().getUsername());
 
 		return result;
+	}
+
+	private UserVO convertToUserVO(UserTime entity) {
+		return DozerConverter.parseObject(entity.getUser(), UserVO.class);
 	}
 
 	private List<Time> getTimesDoUsuario(User user) {
@@ -215,7 +229,7 @@ public class FabricaService implements IFabricaService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public SolicitacaoFaseVO createFase(Long idSprint, Long idSolicitacao, SolicitacaoFaseVO solicitacaoFase) {
+	public void createFase(Long idSprint, Long idSolicitacao, SolicitacaoFaseVO solicitacaoFase) {
 		var sprint = getSprint(idSprint);
 
 		var user = getUsuario();
@@ -231,14 +245,15 @@ public class FabricaService implements IFabricaService {
 
 		var fase = getFase(solicitacaoFase.getFase().getId());
 
+		var responsavel = useRepository.findById(solicitacaoFase.getResponsavel().getKey())
+				.orElseThrow(() -> new ResourceNotFoundException(String.format("Responsável não encontrado para id %d",
+						solicitacaoFase.getResponsavel().getKey())));
+
 		SolicitacaoFase newSolicitacaoFase = new SolicitacaoFase();
-		newSolicitacaoFase.Insert(solicitacao, fase, solicitacaoFase.getObservacao(), solicitacaoFase.getFinalizada());
+		newSolicitacaoFase.Insert(solicitacao, fase, solicitacaoFase.getObservacao(), solicitacaoFase.getFinalizada(),
+				responsavel);
 
-		var entity = solicitacaoFaseRepositoy.save(newSolicitacaoFase);
-
-		var vo = DozerConverter.parseObject(entity, SolicitacaoFaseVO.class);
-
-		return vo;
+		solicitacaoFaseRepositoy.save(newSolicitacaoFase);
 	}
 
 	@Override
@@ -267,7 +282,7 @@ public class FabricaService implements IFabricaService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public SolicitacaoFaseVO updateFase(Long idSprint, Long idSolicitacao, SolicitacaoFaseVO solicitacaoFase) {
+	public void updateFase(Long idSprint, Long idSolicitacao, SolicitacaoFaseVO solicitacaoFase) {
 		var sprint = getSprint(idSprint);
 
 		var user = getUsuario();
@@ -285,18 +300,21 @@ public class FabricaService implements IFabricaService {
 				.orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Fase não encontrado para id %d", solicitacaoFase.getFase().getId())));
 
-		var entity = solicitacaoFaseRepositoy.findById( solicitacaoFase.getKey() )
-				.orElseThrow(() -> new ResourceNotFoundException(String
-						.format("Fase da Solicitação não encontrado para id %d", solicitacaoFase.getFase().getId())));
+		var entity = solicitacaoFaseRepositoy.findById(solicitacaoFase.getKey())
+				.orElseThrow(() -> new ResourceNotFoundException(
+						String.format("Fase da Solicitação não encontrado para id %d", solicitacaoFase.getKey())));
 
-		entity.Atualizar(fase, solicitacaoFase.getObservacao(), solicitacaoFase.getFinalizada());
+		var responsavel = useRepository.findById(solicitacaoFase.getResponsavel().getKey())
+				.orElseThrow(() -> new ResourceNotFoundException(String.format("Responsável não encontrado para id %d",
+						solicitacaoFase.getResponsavel().getKey())));
 
-		var vo = DozerConverter.parseObject(solicitacaoFaseRepositoy.save(entity), SolicitacaoFaseVO.class);
+		entity.Atualizar(fase, solicitacaoFase.getObservacao(), solicitacaoFase.getFinalizada(), responsavel);
 
-		return vo;
+		solicitacaoFaseRepositoy.save(entity);
 	}
 
 	@Override
+	@Transactional(readOnly = false)
 	public void deleteFase(Long idSprint, Long idSolicitacao, Long idFase) {
 		var sprint = getSprint(idSprint);
 
@@ -310,12 +328,34 @@ public class FabricaService implements IFabricaService {
 		sprintSolicitacaoRepository.findBySolicitacaoAndSprint(solicitacao, sprint)
 				.orElseThrow(() -> new ResourceNotFoundException(
 						String.format("Sprint/Solicitação não encontrado para o conjunto")));
-		
-		solicitacaoFaseRepositoy.findById(idFase)
-		.orElseThrow(() -> new ResourceNotFoundException(
+
+		solicitacaoFaseRepositoy.findById(idFase).orElseThrow(() -> new ResourceNotFoundException(
 				String.format("Fase da solicitação não encontrado para id %d", idFase)));
 
 		solicitacaoFaseRepositoy.deleteById(idFase);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<UserVO> findByTime(Long idSprint, Long idSolicitacao) {
+		var sprint = getSprint(idSprint);
+
+		var user = getUsuario();
+
+		getSprintDoUser(idSprint, user);
+
+		var solicitacao = solicitacaoRepository.findById(idSolicitacao).orElseThrow(() -> new ResourceNotFoundException(
+				String.format("Solicitação não encontrado para id %d", idSolicitacao)));
+
+		sprintSolicitacaoRepository.findBySolicitacaoAndSprint(solicitacao, sprint)
+				.orElseThrow(() -> new ResourceNotFoundException(
+						String.format("Sprint/Solicitação não encontrado para o conjunto")));
+
+		List<UserTime> result;
+
+		result = userTimeRepository.findByTime(solicitacao.getSistema().getTime());
+
+		return result.stream().map(this::convertToUserVO).collect(Collectors.toList());
 	}
 
 }

@@ -1,5 +1,8 @@
 package br.com.claudemirojr.sca.api.model.service.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,10 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.claudemirojr.sca.api.exception.ResourceNotFoundException;
 import br.com.claudemirojr.sca.api.model.ParamsRequestModel;
 import br.com.claudemirojr.sca.api.model.entity.UserTime;
+import br.com.claudemirojr.sca.api.model.repository.SolicitacaoRepository;
 import br.com.claudemirojr.sca.api.model.repository.TimeRepository;
 import br.com.claudemirojr.sca.api.model.repository.UserTimeRepository;
 import br.com.claudemirojr.sca.api.model.service.IUserTimeService;
 import br.com.claudemirojr.sca.api.model.vo.IUserTimeVO;
+import br.com.claudemirojr.sca.api.security.model.vo.UserVO;
 import br.com.claudemirojr.sca.api.security.repository.UserRepository;
 
 @Service
@@ -23,9 +28,24 @@ public class UserTimeService implements IUserTimeService {
 
 	@Autowired
 	private TimeRepository timeRepository;
+	
+	@Autowired
+	private SolicitacaoRepository solicitacaoRepository; 
 
 	@Autowired
 	private UserTimeRepository userTimeRepository;
+	
+	
+	
+	private UserVO convertToUserVO(UserTime userTime) {
+		UserVO userVO = new UserVO();
+		userVO.setUserName( userTime.getUser().getUsername() );
+		userVO.setKey( userTime.getUser().getId() );
+
+		return userVO;
+	}	
+	
+	
 
 	@Override
 	@Transactional(readOnly = true)
@@ -75,6 +95,17 @@ public class UserTimeService implements IUserTimeService {
 		var entity = userTimeRepository.findById(id).orElseThrow(
 				() -> new ResourceNotFoundException(String.format("User/Time não encontrado para id %d", id)));
 		return entity;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<UserVO> findByUsuariosDoTimeDaSolicitacao(Long idSolicitacao) {
+		var solicitacao = solicitacaoRepository.findById(idSolicitacao).orElseThrow(
+				() -> new ResourceNotFoundException(String.format("Solicitação não encontrado para id %d", idSolicitacao)));
+		
+		List<UserTime> userTime = userTimeRepository.findByTime(solicitacao.getSistema().getTime());
+		
+		return userTime.stream().map(this::convertToUserVO).collect(Collectors.toList());
 	}
 
 }

@@ -3,6 +3,7 @@ package br.com.claudemirojr.sca.api.controller;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -24,10 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.claudemirojr.sca.api.model.ParamsRequestModel;
 import br.com.claudemirojr.sca.api.model.service.IFabricaService;
+import br.com.claudemirojr.sca.api.model.service.IUserTimeService;
 import br.com.claudemirojr.sca.api.model.vo.AnaliseVO;
 import br.com.claudemirojr.sca.api.model.vo.SolicitacaoFaseVO;
 import br.com.claudemirojr.sca.api.model.vo.SolicitacaoVO;
 import br.com.claudemirojr.sca.api.model.vo.SprintVO;
+import br.com.claudemirojr.sca.api.security.model.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -39,6 +42,9 @@ public class FabricaController {
 
 	@Autowired
 	private IFabricaService service;
+
+	@Autowired
+	private IUserTimeService userTimeService;
 
 	@Operation(summary = "Find all sprints do time, por páginas")
 	@GetMapping
@@ -90,8 +96,10 @@ public class FabricaController {
 
 	@Operation(summary = "Find all fases da solicitação do sprint do time, por páginas")
 	@GetMapping("/{id}/solicitacao/{idSolicitacao}")
-	public ResponseEntity<?> FindBySprintSolicitacaoFase(@PathVariable("id") Long id,
-			@PathVariable("idSolicitacao") Long idSolicitacao, @RequestParam Map<String, String> params) {
+	public ResponseEntity<?> FindBySprintSolicitacaoFase(
+			@PathVariable("id") Long id,
+			@PathVariable("idSolicitacao") Long idSolicitacao, 
+			@RequestParam Map<String, String> params) {
 		ParamsRequestModel prm = new ParamsRequestModel(params);
 
 		Page<SolicitacaoFaseVO> fases = service.FindBySprintSolicitacaoFase(id, idSolicitacao, prm);
@@ -114,10 +122,9 @@ public class FabricaController {
 	@PostMapping("/sprint/{idSprint}/solicitacao/{idSolicitacao}")
 	public ResponseEntity<SolicitacaoFaseVO> createFase(@PathVariable("idSprint") Long idSprint,
 			@PathVariable("idSolicitacao") Long idSolicitacao, @RequestBody @Valid SolicitacaoFaseVO solicitacaoFase) {
+		service.createFase(idSprint, idSolicitacao, solicitacaoFase);
 
-		SolicitacaoFaseVO solicitacaoFaseVO = service.createFase(idSprint, idSolicitacao, solicitacaoFase);
-
-		return new ResponseEntity<>(solicitacaoFaseVO, HttpStatus.CREATED);
+		return new ResponseEntity<>(null, HttpStatus.CREATED);
 	}
 
 	@Operation(summary = "procurar uma fase da solicitação específica pelo seu ID")
@@ -135,20 +142,27 @@ public class FabricaController {
 	public ResponseEntity<SolicitacaoFaseVO> updateFase(@PathVariable("idSprint") Long idSprint,
 			@PathVariable("idSolicitacao") Long idSolicitacao, @RequestBody @Valid SolicitacaoFaseVO solicitacaoFase) {
 
-		SolicitacaoFaseVO solicitacaoFaseVO = service.updateFase(idSprint, idSolicitacao, solicitacaoFase);
+		service.updateFase(idSprint, idSolicitacao, solicitacaoFase);
 
-		return new ResponseEntity<>(solicitacaoFaseVO, HttpStatus.OK);
+		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 
 	@Operation(summary = "Deletar uma fase específica da solicitação")
 	@DeleteMapping("/sprint/{idSprint}/solicitacao/{idSolicitacao}/fase/{idFase}")
-	public ResponseEntity<?> deleteFase(
-			@PathVariable("idSprint") Long idSprint,
-			@PathVariable("idSolicitacao") Long idSolicitacao, 
-			@PathVariable("idFase") Long idFase) {
+	public ResponseEntity<?> deleteFase(@PathVariable("idSprint") Long idSprint,
+			@PathVariable("idSolicitacao") Long idSolicitacao, @PathVariable("idFase") Long idFase) {
 		service.deleteFase(idSprint, idSolicitacao, idFase);
 
 		return ResponseEntity.ok().build();
+	}
+
+	@Operation(summary = "listar os usuários que podem ser responsaveis pela solicitação")
+	@GetMapping("/sprint/{idSprint}/solicitacao/{idSolicitacao}/responsavel")
+	public List<UserVO> findByMovimentacao(@PathVariable("idSprint") Long idSprint,
+			@PathVariable("idSolicitacao") Long idSolicitacao) {
+		List<UserVO> userTime = userTimeService.findByUsuariosDoTimeDaSolicitacao(idSolicitacao);
+
+		return userTime;
 	}
 
 }

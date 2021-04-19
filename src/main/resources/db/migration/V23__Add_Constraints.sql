@@ -43,10 +43,6 @@ alter table cliente_sistema
 
 
 alter table solicitacao_fase 
-	add constraint UK2f4od45j3n7rm98me7mclw4y4 unique (solicitacao_id, fase_id);
-
-
-alter table solicitacao_fase 
 	add constraint FKo5rd0vxlfkb6o44os6mtqm49a foreign key (fase_id) references fase;
 
 

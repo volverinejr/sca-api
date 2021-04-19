@@ -59,4 +59,5 @@ public class LoggingAOP {
 		return object;
 
 	}
+
 }
