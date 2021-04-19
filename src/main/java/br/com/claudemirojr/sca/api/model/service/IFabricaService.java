@@ -1,5 +1,7 @@
 package br.com.claudemirojr.sca.api.model.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 
 import br.com.claudemirojr.sca.api.model.ParamsRequestModel;
@@ -7,6 +9,7 @@ import br.com.claudemirojr.sca.api.model.vo.AnaliseVO;
 import br.com.claudemirojr.sca.api.model.vo.SolicitacaoFaseVO;
 import br.com.claudemirojr.sca.api.model.vo.SolicitacaoVO;
 import br.com.claudemirojr.sca.api.model.vo.SprintVO;
+import br.com.claudemirojr.sca.api.security.model.vo.UserVO;
 
 public interface IFabricaService {
 
@@ -24,14 +27,14 @@ public interface IFabricaService {
 			ParamsRequestModel prm);
 	
 	
-	public SolicitacaoFaseVO createFase(Long idSprint, Long idSolicitacao, SolicitacaoFaseVO solicitacaoFase);
+	public void createFase(Long idSprint, Long idSolicitacao, SolicitacaoFaseVO solicitacaoFase);
 	
 	public SolicitacaoFaseVO FindByFase(Long idSprint, Long idSolicitacao, Long idFase);
 	
-	public SolicitacaoFaseVO updateFase(Long idSprint, Long idSolicitacao, SolicitacaoFaseVO solicitacaoFase);
+	public void updateFase(Long idSprint, Long idSolicitacao, SolicitacaoFaseVO solicitacaoFase);
 	
 	public void deleteFase(Long idSprint, Long idSolicitacao, Long idFase);
 	
-	
+	public List<UserVO> findByTime(Long idSprint, Long idSolicitacao);
 	
 }

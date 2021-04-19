@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.envers.AuditTable;
@@ -22,6 +21,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import br.com.claudemirojr.sca.api.security.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Table(name = "solicitacao_fase", uniqueConstraints = @UniqueConstraint(columnNames = { "solicitacao_id", "fase_id" }))
+@Table(name = "solicitacao_fase")
 @Entity
 @Audited
 @AuditTable(value = "solicitacao_fase_audit")
@@ -56,6 +56,9 @@ public class SolicitacaoFase implements Serializable {
 	@Column(length = 2000, nullable = true)
 	private String observacao;
 
+	@OneToOne(fetch = FetchType.LAZY)
+	private User responsavel;
+
 	// -------AUDITORIA
 	@Column(name = "created_by", nullable = true)
 	@CreatedBy
@@ -68,17 +71,19 @@ public class SolicitacaoFase implements Serializable {
 	private Date createdDate;
 	// -------AUDITORIA
 
-	public void Insert(Solicitacao solicitacao, Fase fase, String observacao, Boolean finalizada) {
+	public void Insert(Solicitacao solicitacao, Fase fase, String observacao, Boolean finalizada, User responsavel) {
 		this.solicitacao = solicitacao;
 		this.fase = fase;
 		this.observacao = observacao;
 		this.finalizada = finalizada;
+		this.responsavel = responsavel;
 	}
 
-	public void Atualizar(Fase fase, String observacao, Boolean finalizada) {
+	public void Atualizar(Fase fase, String observacao, Boolean finalizada, User responsavel) {
 		this.fase = fase;
 		this.observacao = observacao;
 		this.finalizada = finalizada;
+		this.responsavel = responsavel;
 	}
 
 }

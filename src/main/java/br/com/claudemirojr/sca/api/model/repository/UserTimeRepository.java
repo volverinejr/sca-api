@@ -38,5 +38,6 @@ public interface UserTimeRepository extends JpaRepository<UserTime, Long> {
 	
 	List<UserTime> findByUser(User user);
 	
+	List<UserTime> findByTime(Time time);
 
 }

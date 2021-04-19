@@ -10,6 +10,7 @@ import com.github.dozermapper.core.Mapping;
 import com.sun.istack.NotNull;
 
 import br.com.claudemirojr.sca.api.model.entity.Fase;
+import br.com.claudemirojr.sca.api.security.model.vo.UserVO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +18,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@JsonPropertyOrder({ "id", "fase", "finalizada", "observacao" })
+@JsonPropertyOrder({ "id", "fase", "responsavel", "observacao", "finalizada" })
 public class SolicitacaoFaseVO extends RepresentationModel<SolicitacaoFaseVO> implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -28,6 +29,9 @@ public class SolicitacaoFaseVO extends RepresentationModel<SolicitacaoFaseVO> im
 
 	@NotNull
 	private Fase fase;
+
+	@NotNull
+	private UserVO responsavel;
 
 	private Boolean finalizada;
 

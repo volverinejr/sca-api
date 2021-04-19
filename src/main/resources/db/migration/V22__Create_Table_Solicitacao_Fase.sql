@@ -3,6 +3,7 @@ create table solicitacao_fase (
 	
 	solicitacao_id bigint,
 	fase_id bigint,
+	responsavel_id bigint,
 	finalizada boolean,
 	observacao varchar(2000),
 	
