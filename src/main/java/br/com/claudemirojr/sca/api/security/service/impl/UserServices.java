@@ -15,6 +15,7 @@ import br.com.claudemirojr.sca.api.exception.ResourceNotFoundException;
 import br.com.claudemirojr.sca.api.model.ParamsRequestModel;
 import br.com.claudemirojr.sca.api.model.repository.UserClienteSistemaRepository;
 import br.com.claudemirojr.sca.api.security.model.User;
+import br.com.claudemirojr.sca.api.security.model.vo.UserSenhaVOInput;
 import br.com.claudemirojr.sca.api.security.model.vo.UserVO;
 import br.com.claudemirojr.sca.api.security.model.vo.UserVOInput;
 import br.com.claudemirojr.sca.api.security.repository.UserRepository;
@@ -185,6 +186,18 @@ public class UserServices implements UserDetailsService, IUserService {
 		var user = useRepository.findByUserName(userName);
 		
 		return user.getVerOutraSolicitacao();
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public void updateSenha(UserSenhaVOInput UserSenhaVO) {
+		String userName = getUsuarioLogado();
+		
+		var user = useRepository.findByUserName(userName);
+		
+		user.setPassword(UserSenhaVO.getPassword());
+		
+		useRepository.save(user);		
 	}
 
 }

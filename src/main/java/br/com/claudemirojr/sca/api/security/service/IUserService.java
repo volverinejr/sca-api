@@ -3,6 +3,7 @@ package br.com.claudemirojr.sca.api.security.service;
 import org.springframework.data.domain.Page;
 
 import br.com.claudemirojr.sca.api.model.ParamsRequestModel;
+import br.com.claudemirojr.sca.api.security.model.vo.UserSenhaVOInput;
 import br.com.claudemirojr.sca.api.security.model.vo.UserVO;
 import br.com.claudemirojr.sca.api.security.model.vo.UserVOInput;
 
@@ -31,5 +32,7 @@ public interface IUserService {
 	public boolean isAdmin();
 	
 	public boolean isVerOutraSolicitacao();
+	
+	public void updateSenha(UserSenhaVOInput UserSenhaVO);
 
 }

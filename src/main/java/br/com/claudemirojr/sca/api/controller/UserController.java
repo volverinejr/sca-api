@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,6 +28,7 @@ import br.com.claudemirojr.sca.api.model.service.IUserClienteSistemaService;
 import br.com.claudemirojr.sca.api.model.service.IUserTimeService;
 import br.com.claudemirojr.sca.api.model.vo.UserClienteSistemaInput;
 import br.com.claudemirojr.sca.api.security.model.vo.UserPermissionInput;
+import br.com.claudemirojr.sca.api.security.model.vo.UserSenhaVOInput;
 import br.com.claudemirojr.sca.api.security.model.vo.UserTimeInput;
 import br.com.claudemirojr.sca.api.security.model.vo.UserVO;
 import br.com.claudemirojr.sca.api.security.model.vo.UserVOInput;
@@ -74,6 +76,17 @@ public class UserController {
 		return new ResponseEntity<>(userVO, HttpStatus.OK);
 	}
 
+	@Operation(summary = "Atualizar a senha do usuário logado")
+	@PatchMapping
+	public ResponseEntity<UserVO> update(@RequestBody @Valid UserSenhaVOInput userSenhaVOInput) {
+
+		service.updateSenha(userSenhaVOInput);
+
+		return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+	}
+
+	
+	
 	@Operation(summary = "Deletar um usuário específica pelo seu ID")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> delete(@PathVariable("id") Long id) {
